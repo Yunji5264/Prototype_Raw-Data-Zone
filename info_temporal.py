@@ -56,22 +56,34 @@ def filename_contains_date(file_path):
     for pattern in date_patterns:
         match = re.search(pattern, filename)
         if match:
-            return {'date' : match.group(0)}, 3, [0,1]
+            return ({"type": "date",
+                "min_date": match.group(0),
+                "max_date": match.group(0)},
+                    3, [0,1])
 
     # check for month patterns
     for pattern in month_patterns:
         match = re.search(pattern, filename)
         if match:
-            return {'month': match.group(0)}, 2, [0]
+            return ({"type": "month",
+                "min_date": match.group(0),
+                "max_date": match.group(0)},
+                    2, [0])
     for month in months:
         match = re.search(month, filename.lower())
         if match:
-            return {'month': match.group(0)}, 2, [0]
+            return ({"type": "month",
+                "min_date": match.group(0),
+                "max_date": match.group(0)},
+                    2, [0])
 
     # check for year pattern
     match = re.search(year_pattern, filename)
     if match:
-        return {'year': match.group(0)}, 0, [0,1]
+        return ({"type": "year",
+                "min_date": match.group(0),
+                "max_date": match.group(0)},
+                0, [0,1])
 
     return False, False, False
 
