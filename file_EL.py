@@ -9,6 +9,7 @@ from info_temporal import *
 from info_theme import *
 from metadata_creation import *
 from general_functions import *
+from class_predefine import *
 
 code_dataset = 0
 
@@ -207,7 +208,7 @@ if __name__ == "__main__":
 
         if treat:
             root = tk.Tk()
-            app = ThemeSelectionApp(root, folder_structure, file_path, measures, ci)
+            app = ThemeSelectionApp(root, theme_folder_structure, file_path, measures, ci)
             root.mainloop()
 
             # Retrieve final theme after Tkinter closes

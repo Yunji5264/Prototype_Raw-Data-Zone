@@ -5,6 +5,7 @@ from numpy import integer
 from pandas.core.dtypes.inference import is_integer
 from shapely.geometry import box, Point, shape
 from data_load import *
+from class_predefine import *
 import re
 
 

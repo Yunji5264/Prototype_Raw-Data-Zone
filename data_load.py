@@ -108,31 +108,6 @@ hSpatial = [(0, 0, ['COUNTRY', 'PAYS']),
             (1, 6, ['ADRESSE', 'ADDRESS'])
             ]
 
-hS_F0 = [(0, 'COUNTRY'),
-         (1, 'REGION'),
-         (2, 'DEPARTEMENT'),
-         (3, 'ARRONDISSEMENT'),
-         (4, 'CANTON'),
-         (5, 'COMMUNE'),
-         (6, 'GEOPOINT')]
-
-hS_F1 = [(0, 'COUNTRY'),
-         (1, 'EPCI'),
-         (5, 'COMMUNE'),
-         (6, 'GEOPOINT')]
-
-hS_F = [hS_F0, hS_F1]
-
-hT_F0 = [(0, 'YEAR'),
-         (1, 'QUARTER'),
-         (2, 'MONTH'),
-         (3, 'DATE')]
-
-hT_F1 = [(0, 'YEAR'),
-         (1, 'WEEK'),
-         (3, 'DATE')]
-hT_F = [hT_F0, hT_F1]
-
 months = [
         # 英语
         'january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december',
