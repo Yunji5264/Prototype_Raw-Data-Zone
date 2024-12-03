@@ -3,9 +3,10 @@ import os
 import tkinter as tk
 from tkinter import messagebox, Tk, simpledialog, filedialog
 from pathlib import Path
+from save_on_cloud import *
 
 # Specify the base path (where these folders have already been created)
-base_path = r'C:\Users\ADMrechbay20\Documents\RAW_DATA_ZONE'  # e.g., 'C:/Users/YourName/Documents'
+base_path = r'C:\Users\ADMrechbay20\Documents\experimentation\RAW_DATA_ZONE'  # e.g., 'C:/Users/YourName/Documents'
 
 # Retrieve the path to a specific theme
 def get_path(structure, target, path=None):
@@ -33,6 +34,24 @@ def find_least_common_ancestor(folder_structure, selections):
         else:
             break
     return lca
+
+def determine_path(folder_structure, theme):
+    """根据主题确定文件应上传的路径。
+
+    参数:
+    folder_structure (dict): 文件夹结构定义。
+    theme (str): 文件的主题。
+
+    返回:
+    str: 文件应上传的路径。
+    """
+    path = ''
+    for key, subfolders in folder_structure.items():
+        if theme in subfolders:
+            path = key + '/' + theme
+        elif theme == key:
+            path = key
+    return path
 
 
 # Save a file to the specified path
@@ -207,13 +226,23 @@ class ThemeSelectionApp:
 
     def calculate_overall_theme(self):
         # Filter out None values and find the least common ancestor theme
-        filtered_themes = [theme for item in self.selected_measures_themes + self.selected_complementary_themes for theme in item.values() if theme]
-        overall_theme_path = find_least_common_ancestor(self.folder_structure, filtered_themes) if filtered_themes else []
-        self.final_theme = " -> ".join(overall_theme_path) if overall_theme_path else "Root Directory"
-        messagebox.showinfo("Overall Theme", f"The least common ancestor is: {self.final_theme}")
+        filtered_themes = [theme for item in self.selected_measures_themes + self.selected_complementary_themes for
+                           theme in item.values() if theme]
+        overall_theme_path = find_least_common_ancestor(self.folder_structure,
+                                                        filtered_themes) if filtered_themes else []
+        # self.final_theme = " -> ".join(overall_theme_path) if overall_theme_path else "Root Directory"
+        # messagebox.showinfo("Overall Theme", f"The least common ancestor is: {self.final_theme}")
 
-        # Save the file to the determined path
-        save_file_to_path(self.file_path, overall_theme_path)
+        # Determine the path based on the theme
+        determined_path = determine_path(self.folder_structure, overall_theme_path[0])
+        bucket_name = 'prototype_raw_data'
+        destination_blob_name = 'well-being/' + determined_path + '/' + os.path.basename(self.file_path)
+
+        # Save the file to Google Cloud
+        save_file_to_cloud(self.file_path, bucket_name, destination_blob_name)
+
+        # # Save the file to the determined path
+        # save_file_to_path(self.file_path, overall_theme_path)
 
     # Method to get the final theme path
     def get_final_theme(self):

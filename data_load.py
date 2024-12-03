@@ -139,7 +139,9 @@ month_patterns = [
 # use regex to show year pattern
 year_pattern = r'\d{4}'  # YYYY
 
-metadata_file = r'C:\Users\ADMrechbay20\Documents\Metadata\raw_data_metadata.json'
+metadata_file = r'C:\Users\ADMrechbay20\Documents\experimentation\raw_data_metadata.json'
+
+
 
 def list_to_tuple(lst):
     return tuple(list_to_tuple(i) if isinstance(i, list) else i for i in lst)

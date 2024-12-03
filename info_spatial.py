@@ -257,7 +257,7 @@ def gdf_geo(gdf):
     return geo_para, granularityS, list(geo_scope), hierarchiesS
 
 
-def table_geo(df) :
+def df_geo(df) :
     geo_para = []
     geo_scope = []
     geo_scope_pre = []

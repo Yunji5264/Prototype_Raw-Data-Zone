@@ -1,6 +1,7 @@
 import os
 import zipfile
 import xml.etree.ElementTree as ET
+from sys import meta_path
 
 import pandas as pd
 
@@ -10,9 +11,28 @@ from info_theme import *
 from metadata_creation import *
 from general_functions import *
 from class_predefine import *
+from upload_metadata import *
 
 code_dataset = 0
 
+
+def treat_df(df):
+    # Extract spatial information
+    geo_para, granularityS, geo_scope, hierarchiesS = df_geo(df)
+    tem_para, tem_scope, granularityT, hierarchiesT = df_tem(file_path, df)
+
+    # Filter out columns that are not spatial or temporal parameters
+    cols = [col for col in df.columns if col not in geo_para and col not in tem_para]
+
+    # User interaction to select measures
+    root = tk.Tk()
+    app = MeasureSelectionApp(root, cols)
+    root.mainloop()
+
+    # Get complementary info and measures from user input
+    ci, measures = app.get_ci_m()
+
+    return geo_para, geo_scope, granularityS, hierarchiesS, tem_para, tem_scope, granularityT, hierarchiesT, ci, measures, True
 
 # Analyze information from an Excel file
 def excel_EL(file_path):
@@ -31,24 +51,8 @@ def excel_EL(file_path):
     first_row = row_counts.idxmax()
     # Read data from the title line
     df = pd.read_excel(file_path, header=first_row)
-    # Get spatial information: parameters, granularity, and scope
-    geo_para, granularityS, geo_scope, hierarchiesS = table_geo(df)
-    tem_para, tem_scope, granularityT, hierarchiesT = df_tem(file_path, df)
-    measures = []
-    ci = []
 
-    # Filter out columns that are not spatial or temporal parameters
-    cols = [col for col in df.columns if col not in geo_para and col not in tem_para]
-
-    # User interaction to select measures
-    root = tk.Tk()
-    app = MeasureSelectionApp(root, cols)
-    root.mainloop()
-
-    # Get complementary info and measures from user input
-    ci, measures = app.get_ci_m()
-
-    return geo_para, geo_scope, granularityS, hierarchiesS, tem_para, tem_scope, granularityT, hierarchiesT, ci, measures, True
+    return treat_df(df)
 
 
 # Analyze information from a CSV file
@@ -64,24 +68,7 @@ def csv_EL(file_path):
         except:
             df = pd.read_csv(file_path, encoding='latin1', sep=';', low_memory=False, on_bad_lines='skip')
 
-    # Extract spatial information
-    geo_para, granularityS, geo_scope, hierarchiesS = table_geo(df)
-    tem_para, tem_scope, granularityT, hierarchiesT = df_tem(file_path, df)
-    measures = []
-    ci = []
-
-    # Filter out columns that are not spatial or temporal parameters
-    cols = [col for col in df.columns if col not in geo_para and col not in tem_para]
-
-    # User interaction to select measures
-    root = tk.Tk()
-    app = MeasureSelectionApp(root, cols)
-    root.mainloop()
-
-    # Get complementary info and measures from user input
-    ci, measures = app.get_ci_m()
-
-    return geo_para, geo_scope, granularityS, hierarchiesS, tem_para, tem_scope, granularityT, hierarchiesT, ci, measures, True
+    return treat_df(df)
 
 
 # Analyze information from a GeoJSON file
@@ -215,9 +202,11 @@ if __name__ == "__main__":
             theme = app.get_final_theme()
             ci, measures = app.get_measures_and_themes()
 
-            metadata_entry = create_metadata_entry(file_path, code_dataset, os.path.basename(file_path), '', '',
+            create_metadata(file_path, code_dataset, os.path.basename(file_path), '', '',
                                                    os.path.splitext(file_path)[1], theme,
                                                    [list(geo_para), list(tem_para)], list(ci), list(measures),
                                                    granularityS, granularityT, geo_scope, tem_scope,
                                                    [hierarchiesS, hierarchiesT])
-            write_metadata_to_file(metadata_file, metadata_entry)
+    bucket_name = 'prototype_governance_zone'
+    upload_file_to_gcs(bucket_name, metadata_file)
+
